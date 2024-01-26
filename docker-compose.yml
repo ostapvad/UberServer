@@ -10,3 +10,24 @@ services:
     image: mitchallen/random-server
     expose:
     - 3100
+  postgres-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./queries/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: [ "postgres", "-c", "log_statement=all" ]
+  fastapi-app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile-fastapi
+    ports:
+      - "8083:80"
+    depends_on:
+      - postgres-db
+
+
